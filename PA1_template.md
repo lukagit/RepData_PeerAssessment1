@@ -21,7 +21,8 @@ The variables included in this dataset are:
 ## Loading and preprocessing the data
 
 Needed packages:
-```{r message = FALSE}
+
+```r
 library(ggplot2)
 library(lubridate)
 ```
@@ -29,7 +30,8 @@ library(lubridate)
 Code for reading in the dataset and/or processing the data
 
 
-```{r}
+
+```r
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", destfile = "activity.zip")
 unzip("activity.zip")
 activity <- read.csv("activity.csv", stringsAsFactors=FALSE)
@@ -37,7 +39,8 @@ activity <- read.csv("activity.csv", stringsAsFactors=FALSE)
 
 Histogram of the total number of steps taken each day
 
-```{r plot1, fig.path = "figure/"}
+
+```r
 stepsperday <- aggregate(steps ~ date, activity, FUN = sum)
 ggplot(stepsperday, aes(steps))+
     geom_histogram(binwidth  = 2000)+
@@ -45,38 +48,52 @@ ggplot(stepsperday, aes(steps))+
     ggtitle("Histogram of the total number of steps taken each day")
 ```
 
+![](figure/plot1-1.png)<!-- -->
+
 
 
 ## What is mean total number of steps taken per day?
 
 Mean and median number of steps taken each day
-```{r}
+
+```r
 meanstepsperday <- mean(stepsperday$steps)
 mdianstepsperday <- median(stepsperday$steps)
 print(paste0("Mean is ", meanstepsperday, ", and Median is ", mdianstepsperday))
+```
+
+```
+## [1] "Mean is 10766.1886792453, and Median is 10765"
 ```
 
 
 ## What is the average daily activity pattern?
 
 Time series plot of the average number of steps taken 
-```{r}
-```
 
 
-```{r plot2, fig.path = "figure/"}
+
+
+```r
 stepsperinterval <- aggregate(steps ~ interval, activity, FUN = mean)
 ggplot(data=stepsperinterval, aes(x=interval, y=steps))+
     geom_line(colour = "blue", size = 1)+
     ggtitle("Average number of steps taken")
 ```
 
+![](figure/plot2-1.png)<!-- -->
+
 The 5-minute interval that, on average, contains the maximum number of steps
 
-```{r}
+
+```r
 maxsteps <- max(stepsperinterval$steps)
 maxstepsinterval <- stepsperinterval$interval[which(stepsperinterval$steps == maxsteps)]
 print(paste0("5 minute interval with max steps: ", maxstepsinterval))
+```
+
+```
+## [1] "5 minute interval with max steps: 835"
 ```
 
 
@@ -86,7 +103,8 @@ Code to describe and show a strategy for imputing missing data
 
 Code to calculate the total number of missing values in the dataset, in order to impute the average.
 
-```{r}
+
+```r
 numNA <- nrow(activity) -nrow(activity[complete.cases(activity),])
 imputedData <- activity
 meanForNA <- aggregate(steps~interval,imputedData, FUN=mean)
@@ -97,17 +115,20 @@ for(i in 1:nrow(imputedData)){
 }
 ```
 Histogram of the total number of steps taken each day after missing values are imputed
-```{r plot5, fig.path = "figure/"}
-ggplot(imputedData,aes(as.factor(date),steps))+geom_bar(fill="royalblue3", stat="identity")+xlab("Day") + ylab("Steps")+ggtitle("Histogram of the Total Number of Steps Taken Each Day (Imputed Data)")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
+```r
+ggplot(imputedData,aes(as.factor(date),steps))+geom_bar(fill="royalblue3", stat="identity")+xlab("Day") + ylab("Steps")+ggtitle("Histogram of the Total Number of Steps Taken Each Day (Imputed Data)")+ theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
+
+![](figure/plot5-1.png)<!-- -->
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
-```{r}
+
+```r
 activity$date <- ymd(activity$date)
 activity$wday <- wday(activity$date, label = T)
 activity$we <- "weekday"
@@ -116,12 +137,15 @@ weekdata <- aggregate(steps~interval + we, activity, FUN = mean)
 ```
 
 
-```{r plot4, fig.path = "figure/"}
+
+```r
 ggplot(data=weekdata, aes(x=interval, y=steps))+
     geom_line(colour = "red", size = 1)+
     facet_grid(we~.)+
     ggtitle("Average number of steps taken each interval")
 ```
+
+![](figure/plot4-1.png)<!-- -->
 
 All of the R code needed to reproduce the results (numbers, plots, etc.) in the report.
 
